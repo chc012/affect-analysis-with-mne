@@ -4,3 +4,6 @@ Exploratory analysis of the gaze data in the Mahnob HCI dataset. Code in this di
 
 ## Usage
 - Gaze data path names must be provided to `raw_data` variables across notebooks.
+
+Note:
+`find_fixations_saccades.py` made by Aashish Patel and Siddarth
