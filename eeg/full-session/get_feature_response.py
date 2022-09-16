@@ -3,15 +3,6 @@ import numpy as np
 import xml.etree.cElementTree as et
 from mne.preprocessing import ICA
 
-# From the data manual
-EEG_CHS = ['Fp1', 'AF3', 'F3', 'F7', 'FC5', 'FC1', 'C3', 'T7', 'CP5', 
-           'CP1', 'P3', 'P7', 'PO3', 'O1', 'Oz', 'Pz', 'Fp2', 'AF4', 
-           'Fz', 'F4', 'F8', 'FC6', 'FC2', 'Cz', 'C4', 'T8', 'CP6', 
-           'CP2', 'P4', 'P8', 'PO4', 'O2']
-STIM_CHS = ['Status']
-OTHER_CHS = ['EXG1', 'EXG2', 'EXG3', 'EXG4', 'EXG5', 'EXG6', 'EXG7', 
-             'EXG8', 'GSR1', 'GSR2', 'Erg1', 'Erg2', 'Resp', 'Temp']
-
 # Taken from https://github.com/TNEL-UCSD/limbic-analysis-dynamics/blob/
 #            master/scripts/iads_gen_features.py
 FREQ_RANGES = {
@@ -55,14 +46,12 @@ def bdf_to_features(raw, duration, freq_bands, chs, window):
     # Based on code from limbic-analysis-dynamics repo
     for raw in raw_by_freq:
         data = raw.get_data()
-
         # mean across time per channel
         m = np.mean(data, axis=1)
         m = np.tile(m, (data.shape[1], 1)).T
         s = np.std(data, axis=1, ddof=1)
         s = np.tile(s, (data.shape[1], 1)).T
         z_score = (data - m) / s
-
         raw.apply_function(lambda _: z_score, channel_wise=False)
         raw.apply_hilbert(n_jobs=16, envelope=True)
         raw.apply_function(np.square, dtype=np.float64)
@@ -81,20 +70,15 @@ def bdf_to_features(raw, duration, freq_bands, chs, window):
     # Make feature array
     features_list = []
     for band in data:
-
         resampled_band = []
         for ch in band:
-
             resampled_ch = []
             for i in range(len(sample_seps) - 1):
-
                 start = sample_seps[i]
                 end = sample_seps[i+1]
                 sample = np.mean(ch[start:end])
                 resampled_ch.append(sample)
-
             resampled_band.append(resampled_ch)
-
         features_list.append(resampled_band)
 
     # Make feature arrays
